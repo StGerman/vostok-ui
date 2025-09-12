@@ -1,0 +1,161 @@
+version: '3.8'
+
+services:
+  # ===== OpenLIT Dashboard =====
+  openlit:
+    image: ghcr.io/openlit/openlit:latest
+    platform: linux/arm64
+    container_name: openlit-dashboard
+    environment:
+      - TELEMETRY_ENABLED=${TELEMETRY_ENABLED:-true}
+      - INIT_DB_HOST=${INIT_DB_HOST}
+      - INIT_DB_PORT=${INIT_DB_PORT}
+      - INIT_DB_DATABASE=${INIT_DB_DATABASE:-openlit}
+      - INIT_DB_USERNAME=${INIT_DB_USERNAME:-default}
+      - INIT_DB_PASSWORD=${INIT_DB_PASSWORD}
+      - SQLITE_DATABASE_URL=file:/app/client/data/data.db
+      - PORT=${OPENLIT_PORT:-3000}
+      - DOCKER_PORT=${OPENLIT_PORT:-3000}
+      - DEMO_ACCOUNT_EMAIL=${DEMO_ACCOUNT_EMAIL}
+      - DEMO_ACCOUNT_PASSWORD=${DEMO_ACCOUNT_PASSWORD}
+    ports:
+      - "${OPENLIT_PORT:-3000}:${OPENLIT_PORT:-3000}"
+    volumes:
+      - openlit-data:/app/client/data
+    networks:
+      - vostok-network
+    restart: always
+    labels:
+      - "com.vostok.service=openlit-dashboard"
+      - "com.vostok.component=observability"
+
+  # ===== OpenTelemetry Collector =====
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.94.0
+    platform: linux/arm64
+    container_name: vostok-otel-collector
+    environment:
+      - OTEL_DB_HOST=${OTEL_DB_HOST}
+      - OTEL_DB_PORT=${OTEL_DB_PORT}
+      - OTEL_DB_SECURE=${OTEL_DB_SECURE:-true}
+      - INIT_DB_HOST=${INIT_DB_HOST}
+      - INIT_DB_PORT=${INIT_DB_PORT}
+      - INIT_DB_DATABASE=${INIT_DB_DATABASE:-openlit}
+      - INIT_DB_USERNAME=${INIT_DB_USERNAME:-default}
+      - INIT_DB_PASSWORD=${INIT_DB_PASSWORD}
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "8888:8888"   # Metrics endpoint
+      - "55679:55679" # zpages
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+    networks:
+      - vostok-network
+    restart: always
+    depends_on:
+      - openlit
+    labels:
+      - "com.vostok.service=otel-collector"
+      - "com.vostok.component=observability"
+
+  # ===== Vostok RAG API =====
+  vostok-api:
+    image: ghcr.io/stgerman/vostok-rag-api:latest
+    platform: linux/arm64
+    container_name: vostok-rag-api
+    environment:
+      # Pinecone Configuration
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - PINECONE_INDEX_NAME=${PINECONE_INDEX_NAME:-vostok-documents}
+
+      # Anthropic Configuration
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+
+      # VoyageAI Configuration
+      - VOYAGE_API_KEY=${VOYAGE_API_KEY}
+
+      # OpenLIT/OTEL Configuration
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+      - OPENLIT_APPLICATION_NAME=vostok-rag-api
+      - OPENLIT_ENVIRONMENT=production
+
+      # Application Configuration
+      - PYTHONPATH=/app
+      - LOG_LEVEL=INFO
+      - API_VERSION=v1
+      - CORS_ORIGINS=http://localhost:3000,http://34.225.86.252
+
+    ports:
+      - "8000:8000"
+    networks:
+      - vostok-network
+    restart: always
+    depends_on:
+      - otel-collector
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    labels:
+      - "com.vostok.service=rag-api"
+      - "com.vostok.component=backend"
+
+  # ===== Vostok Chat UI =====
+  vostok-ui:
+    image: ghcr.io/stgerman/vostok-chat-ui:latest
+    platform: linux/arm64
+    container_name: vostok-chat-ui
+    environment:
+      - NGINX_HOST=0.0.0.0
+      - NGINX_PORT=80
+      - API_BASE_URL=http://vostok-api:8000
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - vostok-network
+    restart: always
+    depends_on:
+      - vostok-api
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health.html"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.vostok.service=chat-ui"
+      - "com.vostok.component=frontend"
+
+  # ===== Nginx Reverse Proxy (Optional - for advanced routing) =====
+  nginx-proxy:
+    image: nginx:alpine
+    platform: linux/arm64
+    container_name: vostok-nginx-proxy
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx-proxy.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - vostok-network
+    restart: always
+    depends_on:
+      - vostok-ui
+      - vostok-api
+      - openlit
+    labels:
+      - "com.vostok.service=nginx-proxy"
+      - "com.vostok.component=proxy"
+
+volumes:
+  openlit-data:
+    driver: local
+
+networks:
+  vostok-network:
+    driver: bridge
+    name: vostok-network

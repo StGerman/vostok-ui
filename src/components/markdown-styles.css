@@ -1,0 +1,200 @@
+/* Enhanced Markdown Styles for Chat Interface */
+
+/* Code blocks with syntax highlighting */
+.markdown-content pre {
+  position: relative;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+.markdown-content code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+/* Enhanced table styling */
+.markdown-content table {
+  border-spacing: 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.markdown-content table th {
+  background-color: var(--table-header-bg);
+  font-weight: 600;
+}
+
+.markdown-content table tr:nth-child(even) {
+  background-color: var(--table-row-even-bg);
+}
+
+.markdown-content table tr:hover {
+  background-color: var(--table-row-hover-bg);
+}
+
+/* Enhanced blockquote styling */
+.markdown-content blockquote {
+  position: relative;
+}
+
+.markdown-content blockquote::before {
+  content: '"';
+  position: absolute;
+  left: -0.5rem;
+  top: -0.25rem;
+  font-size: 2rem;
+  color: var(--quote-accent-color);
+  opacity: 0.5;
+}
+
+/* Enhanced link styling */
+.markdown-content a {
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  transition: all 0.2s ease;
+}
+
+.markdown-content a:hover {
+  text-decoration-thickness: 3px;
+  transform: translateY(-1px);
+}
+
+/* Image styling */
+.markdown-content img {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.markdown-content img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* List styling */
+.markdown-content ul > li::marker {
+  color: var(--list-marker-color);
+}
+
+.markdown-content ol > li::marker {
+  color: var(--list-marker-color);
+  font-weight: 600;
+}
+
+/* Task list styling (GitHub flavored markdown) */
+.markdown-content input[type="checkbox"] {
+  margin-right: 0.5rem;
+  margin-left: -1.5rem;
+  accent-color: var(--checkbox-accent-color);
+}
+
+.markdown-content li:has(input[type="checkbox"]) {
+  list-style: none;
+}
+
+/* Strikethrough text */
+.markdown-content del {
+  text-decoration-thickness: 2px;
+}
+
+/* Keyboard key styling */
+.markdown-content kbd {
+  background: var(--kbd-bg);
+  border: 1px solid var(--kbd-border);
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.875em;
+  font-family: monospace;
+  box-shadow: 0 1px 0 var(--kbd-shadow);
+}
+
+/* Math expressions (if needed) */
+.markdown-content .math {
+  font-family: 'KaTeX_Main', 'Times New Roman', serif;
+}
+
+/* Dark mode variables */
+:root {
+  --table-header-bg: rgb(249 250 251);
+  --table-row-even-bg: rgb(249 250 251);
+  --table-row-hover-bg: rgb(243 244 246);
+  --quote-accent-color: rgb(59 130 246);
+  --list-marker-color: rgb(59 130 246);
+  --checkbox-accent-color: rgb(59 130 246);
+  --kbd-bg: rgb(243 244 246);
+  --kbd-border: rgb(209 213 219);
+  --kbd-shadow: rgb(209 213 219);
+}
+
+.dark {
+  --table-header-bg: rgb(31 41 55);
+  --table-row-even-bg: rgb(31 41 55);
+  --table-row-hover-bg: rgb(55 65 81);
+  --quote-accent-color: rgb(96 165 250);
+  --list-marker-color: rgb(96 165 250);
+  --checkbox-accent-color: rgb(96 165 250);
+  --kbd-bg: rgb(55 65 81);
+  --kbd-border: rgb(75 85 99);
+  --kbd-shadow: rgb(75 85 99);
+}
+
+/* Smooth animations */
+.markdown-content * {
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Copy button animations */
+.copy-button {
+  transition: all 0.2s ease;
+}
+
+.copy-button:hover {
+  transform: scale(1.1);
+}
+
+.copy-button:active {
+  transform: scale(0.95);
+}
+
+/* Focus states for accessibility */
+.markdown-content a:focus,
+.markdown-content button:focus {
+  outline: 2px solid var(--checkbox-accent-color);
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .markdown-content {
+    color: black !important;
+    background: white !important;
+  }
+  
+  .markdown-content a {
+    color: black !important;
+    text-decoration: underline !important;
+  }
+  
+  .markdown-content pre,
+  .markdown-content code {
+    background: #f5f5f5 !important;
+    border: 1px solid #ddd !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .markdown-content {
+    --quote-accent-color: currentColor;
+    --list-marker-color: currentColor;
+    --checkbox-accent-color: currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .markdown-content *,
+  .copy-button,
+  .markdown-content img {
+    transition: none !important;
+    animation: none !important;
+  }
+}

@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # ===== OpenLIT Dashboard =====
+  openlit:
+    image: ghcr.io/openlit/openlit:latest
+    platform: linux/arm64
+    container_name: openlit-dashboard
+    environment:
+      - TELEMETRY_ENABLED=${TELEMETRY_ENABLED:-true}
+      - SQLITE_DATABASE_URL=file:/app/client/data/data.db
+      - PORT=${OPENLIT_PORT:-3000}
+      - DOCKER_PORT=${OPENLIT_PORT:-3000}
+      - DEMO_ACCOUNT_EMAIL=${DEMO_ACCOUNT_EMAIL}
+      - DEMO_ACCOUNT_PASSWORD=${DEMO_ACCOUNT_PASSWORD}
+    ports:
+      - "${OPENLIT_PORT:-3000}:${OPENLIT_PORT:-3000}"
+    volumes:
+      - openlit-data:/app/client/data
+    networks:
+      - vostok-network
+    restart: always
+    labels:
+      - "com.vostok.service=openlit-dashboard"
+      - "com.vostok.component=observability"
+
+  # ===== OpenTelemetry Collector =====
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.94.0
+    platform: linux/arm64
+    container_name: vostok-otel-collector
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "8888:8888"   # Metrics endpoint
+      - "55679:55679" # zpages
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+    networks:
+      - vostok-network
+    restart: always
+    depends_on:
+      - openlit
+    labels:
+      - "com.vostok.service=otel-collector"
+      - "com.vostok.component=observability"
+
+  # ===== Vostok Chat UI =====
+  vostok-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    container_name: vostok-chat-ui
+    ports:
+      - "80:80"
+    networks:
+      - vostok-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health.html"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.vostok.service=chat-ui"
+      - "com.vostok.component=frontend"
+
+volumes:
+  openlit-data:
+    driver: local
+
+networks:
+  vostok-network:
+    driver: bridge
+    name: vostok-network

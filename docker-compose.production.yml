@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # FastAPI Backend
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile.ec2
+    container_name: vostok-api
+    ports:
+      - "8000:8000"
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT}
+      - OPENLIT_APPLICATION_NAME=vostok-production
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - PINECONE_INDEX_NAME=${PINECONE_INDEX_NAME}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - VOYAGEAI_API_KEY=${VOYAGEAI_API_KEY}
+    volumes:
+      - ../data:/app/data:ro
+    restart: unless-stopped
+    networks:
+      - vostok-network
+
+  # React Frontend
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vostok-ui
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - vostok-network
+    volumes:
+      - ./ssl:/etc/ssl/certs:ro  # For SSL certificates if needed
+
+networks:
+  vostok-network:
+    driver: bridge
+
+volumes:
+  ssl-certs:
