@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vostok Health</title>
+</head>
+<body>
+    <h1>Vostok UI is running!</h1>
+    <p>Timestamp: <!-- TIMESTAMP --></p>
+    <script>
+        document.body.innerHTML = document.body.innerHTML.replace('<!-- TIMESTAMP -->', new Date().toISOString());
+    </script>
+</body>
+</html>
