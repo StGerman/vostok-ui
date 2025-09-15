@@ -69,7 +69,7 @@ const AssistantAvatar: React.FC<AssistantAvatarProps> = ({ isDark }) => (
   </div>
 );
 
-export const MessageBubble: React.FC<MessageBubbleProps & { isDark: boolean }> = ({
+const MessageBubbleComponent: React.FC<MessageBubbleProps & { isDark: boolean }> = ({
   message,
   isLast,
   isDark,
@@ -78,7 +78,11 @@ export const MessageBubble: React.FC<MessageBubbleProps & { isDark: boolean }> =
   const timestamp = message.timestamp ? new Date(message.timestamp) : new Date();
 
   return (
-    <div className={`flex gap-3 group relative ${isUser ? 'flex-row-reverse' : 'flex-row'} ${isLast ? 'animate-slide-up' : ''}`}>
+    <div
+      className={`flex gap-3 group relative ${isUser ? 'flex-row-reverse' : 'flex-row'} ${isLast ? 'animate-slide-up' : ''}`}
+      data-testid="message-bubble"
+      data-role={message.role}
+    >
       {/* Avatar */}
       <div className="flex-shrink-0">
         {isUser ? (
@@ -100,6 +104,7 @@ export const MessageBubble: React.FC<MessageBubbleProps & { isDark: boolean }> =
               : 'bg-gray-100 text-gray-900'
             }
           `}
+          data-testid="message-content"
         >
           {/* Copy button */}
           <CopyButton content={message.content} isDark={isDark} />
@@ -119,12 +124,12 @@ export const MessageBubble: React.FC<MessageBubbleProps & { isDark: boolean }> =
 
                   if (isInline) {
                     return (
-                      <code 
+                      <code
                         className={`px-1.5 py-0.5 rounded-md font-mono text-sm ${
-                          isDark 
-                            ? 'bg-gray-700 text-yellow-300 border border-gray-600' 
+                          isDark
+                            ? 'bg-gray-700 text-yellow-300 border border-gray-600'
                             : 'bg-gray-200 text-red-600 border border-gray-300'
-                        } ${className || ''}`} 
+                        } ${className || ''}`}
                         {...props}
                       >
                         {children}
@@ -135,8 +140,8 @@ export const MessageBubble: React.FC<MessageBubbleProps & { isDark: boolean }> =
                   return (
                     <div className="relative group">
                       <pre className={`mt-3 mb-3 p-4 rounded-lg overflow-x-auto border ${
-                        isDark 
-                          ? 'bg-gray-900 border-gray-700 text-gray-100' 
+                        isDark
+                          ? 'bg-gray-900 border-gray-700 text-gray-100'
                           : 'bg-gray-50 border-gray-200 text-gray-900'
                       }`}>
                         <code className={`font-mono text-sm ${className || ''}`} {...props}>
@@ -220,7 +225,7 @@ export const MessageBubble: React.FC<MessageBubbleProps & { isDark: boolean }> =
                 li: ({ children, className }) => {
                   // Check if this is a task list item
                   const isTaskList = className?.includes('task-list-item');
-                  
+
                   if (isTaskList) {
                     return (
                       <li className="list-none leading-relaxed flex items-start gap-2">
@@ -228,7 +233,7 @@ export const MessageBubble: React.FC<MessageBubbleProps & { isDark: boolean }> =
                       </li>
                     );
                   }
-                  
+
                   return (
                     <li className="leading-relaxed">{children}</li>
                   );
@@ -255,8 +260,8 @@ export const MessageBubble: React.FC<MessageBubbleProps & { isDark: boolean }> =
                 // Enhanced blockquote support
                 blockquote: ({ children }) => (
                   <blockquote className={`border-l-4 pl-4 py-2 my-4 rounded-r-md ${
-                    isDark 
-                      ? 'border-primary-500 bg-gray-800/50 text-gray-300' 
+                    isDark
+                      ? 'border-primary-500 bg-gray-800/50 text-gray-300'
                       : 'border-primary-500 bg-primary-50 text-gray-700'
                   }`}>
                     <div className="italic">{children}</div>
@@ -270,8 +275,8 @@ export const MessageBubble: React.FC<MessageBubbleProps & { isDark: boolean }> =
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`inline-flex items-center gap-1 underline underline-offset-2 transition-colors ${
-                      isDark 
-                        ? 'text-primary-400 hover:text-primary-300' 
+                      isDark
+                        ? 'text-primary-400 hover:text-primary-300'
                         : 'text-primary-600 hover:text-primary-700'
                     }`}
                     {...props}
@@ -298,8 +303,8 @@ export const MessageBubble: React.FC<MessageBubbleProps & { isDark: boolean }> =
                     />
                     {/* Fallback for broken images */}
                     <div className={`hidden p-4 rounded-lg border-2 border-dashed text-center ${
-                      isDark 
-                        ? 'border-gray-600 bg-gray-800 text-gray-400' 
+                      isDark
+                        ? 'border-gray-600 bg-gray-800 text-gray-400'
                         : 'border-gray-300 bg-gray-50 text-gray-500'
                     }`}>
                       <div className="text-sm">
@@ -377,8 +382,8 @@ export const MessageBubble: React.FC<MessageBubbleProps & { isDark: boolean }> =
                 // Keyboard shortcut styling
                 kbd: ({ children }) => (
                   <kbd className={`px-2 py-1 text-xs font-mono rounded border ${
-                    isDark 
-                      ? 'bg-gray-700 border-gray-600 text-gray-300 shadow-sm' 
+                    isDark
+                      ? 'bg-gray-700 border-gray-600 text-gray-300 shadow-sm'
                       : 'bg-gray-100 border-gray-300 text-gray-700 shadow-sm'
                   }`}>
                     {children}
@@ -387,7 +392,7 @@ export const MessageBubble: React.FC<MessageBubbleProps & { isDark: boolean }> =
 
                 // Abbreviation support
                 abbr: ({ children, title }) => (
-                  <abbr 
+                  <abbr
                     title={title}
                     className={`border-b border-dotted cursor-help ${
                       isDark ? 'border-gray-500' : 'border-gray-400'
@@ -400,8 +405,8 @@ export const MessageBubble: React.FC<MessageBubbleProps & { isDark: boolean }> =
                 // Mark/highlight support
                 mark: ({ children }) => (
                   <mark className={`px-1 rounded ${
-                    isDark 
-                      ? 'bg-yellow-600/30 text-yellow-200' 
+                    isDark
+                      ? 'bg-yellow-600/30 text-yellow-200'
                       : 'bg-yellow-200 text-yellow-800'
                   }`}>
                     {children}
@@ -444,3 +449,15 @@ export const MessageBubble: React.FC<MessageBubbleProps & { isDark: boolean }> =
     </div>
   );
 };
+
+// Optimized with React.memo to prevent unnecessary re-renders
+export const MessageBubble = React.memo(MessageBubbleComponent, (prevProps, nextProps) => {
+  // Custom comparison function for optimal performance
+  return (
+    prevProps.message.id === nextProps.message.id &&
+    prevProps.message.content === nextProps.message.content &&
+    prevProps.isLast === nextProps.isLast &&
+    prevProps.isDark === nextProps.isDark &&
+    prevProps.message.sources?.length === nextProps.message.sources?.length
+  );
+});

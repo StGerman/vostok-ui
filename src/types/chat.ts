@@ -1,9 +1,12 @@
+import type { SourceAttribution } from './sources';
+
 // API Types
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
   id?: string;
   timestamp?: Date;
+  sources?: SourceAttribution[];
 }
 
 export interface ChatCompletionRequest {
@@ -13,6 +16,27 @@ export interface ChatCompletionRequest {
   temperature?: number; // Default: 0.1, Range: 0.0-2.0
   max_context_chunks?: number; // Default: 5, Range: 1-10
   similarity_threshold?: number; // Default: 0.7, Range: 0.0-1.0
+}
+
+// Vostok RAG API Extensions (OpenAI Compatible)
+export interface VostokChatCompletionRequest {
+  // Standard OpenAI fields
+  model: string;
+  messages: ChatMessage[];
+  stream?: boolean;
+  temperature?: number;
+  max_tokens?: number;
+
+  // Vostok RAG-specific parameters
+  max_context_chunks?: number;
+  similarity_threshold?: number;
+
+  // OpenAI compatibility (optional)
+  top_p?: number;
+  frequency_penalty?: number;
+  presence_penalty?: number;
+  stop?: string | string[];
+  user?: string;
 }
 
 export interface ChatCompletionResponse {
@@ -30,6 +54,53 @@ export interface ChatCompletionResponse {
     completion_tokens: number;
     total_tokens: number;
   };
+}
+
+// Vostok streaming response types
+export interface VostokMessageDelta {
+  role?: 'assistant';
+  content?: string;
+}
+
+export interface VostokStreamChoice {
+  index: number;
+  delta: VostokMessageDelta;
+  finish_reason?: string;
+}
+
+export interface VostokChatCompletionChunk {
+  id: string;
+  object: 'chat.completion.chunk';
+  created: number;
+  model: string;
+  choices: VostokStreamChoice[];
+}
+
+export interface VostokAssistantMessage {
+  role: 'assistant';
+  content: string;
+  sources?: SourceAttribution[];
+}
+
+export interface VostokCompletionChoice {
+  index: number;
+  message: VostokAssistantMessage;
+  finish_reason: string;
+}
+
+export interface VostokTokenUsage {
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_tokens: number;
+}
+
+export interface VostokChatCompletion {
+  id: string;
+  object: 'chat.completion';
+  created: number;
+  model: string;
+  choices: VostokCompletionChoice[];
+  usage: VostokTokenUsage;
 }
 
 // UI State Types

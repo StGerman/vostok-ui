@@ -8,7 +8,7 @@ interface ChatInputWithSettingsProps extends ChatInputProps {
   isDark: boolean;
 }
 
-export const ChatInput: React.FC<ChatInputWithSettingsProps> = ({
+const ChatInputComponent: React.FC<ChatInputWithSettingsProps> = ({
   value,
   onChange,
   onSend,
@@ -56,7 +56,7 @@ export const ChatInput: React.FC<ChatInputWithSettingsProps> = ({
       border-t p-4
       ${isDark ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}
     `}>
-      <form onSubmit={handleSubmit} className="flex items-center gap-3">
+  <form onSubmit={handleSubmit} className="flex items-center gap-3" data-testid="chat-input-form">
         {/* Settings Toggle Button */}
         <button
           type="button"
@@ -76,7 +76,7 @@ export const ChatInput: React.FC<ChatInputWithSettingsProps> = ({
         </button>
 
         {/* Message Input */}
-        <div className="flex-1 relative">
+  <div className="flex-1 relative" data-testid="chat-input-wrapper">
           <textarea
             ref={textareaRef}
             value={value}
@@ -95,6 +95,7 @@ export const ChatInput: React.FC<ChatInputWithSettingsProps> = ({
               }
               ${disabled || isLoading ? 'opacity-50 cursor-not-allowed' : ''}
             `}
+            data-testid="chat-input-textarea"
           />
 
           {/* Character count (optional) */}
@@ -125,6 +126,7 @@ export const ChatInput: React.FC<ChatInputWithSettingsProps> = ({
             }
           `}
           title={isLoading ? 'Отправка...' : 'Отправить сообщение (Enter)'}
+          data-testid="send-button"
         >
           {isLoading ? (
             <Loader2 className="w-5 h-5 animate-spin" />
@@ -145,3 +147,14 @@ export const ChatInput: React.FC<ChatInputWithSettingsProps> = ({
     </div>
   );
 };
+
+// Optimized with React.memo to prevent unnecessary re-renders
+export const ChatInput = React.memo(ChatInputComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.value === nextProps.value &&
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.showSettings === nextProps.showSettings &&
+    prevProps.isDark === nextProps.isDark
+  );
+});

@@ -4,7 +4,6 @@ import { MessageBubble } from './components/MessageBubble';
 import { ChatInput } from './components/ChatInput';
 import { ChatSettingsPanel } from './components/ChatSettings';
 import { TypingIndicator } from './components/TypingIndicator';
-import { StreamingLiveRegion, StatusLiveRegion, useLiveRegions } from './components/LiveRegion';
 import { useChatStore } from './stores/chatStore';
 import { useThemeStore } from './stores/themeStore';
 import { streamingService } from './services/streamingService';
@@ -31,13 +30,9 @@ export const ChatInterface: React.FC = () => {
     toggleTheme,
   } = useThemeStore();
 
-  // Accessibility live regions
-  const { announceError, announceStatus, errorStatus, generalStatus } = useLiveRegions();
-
   // Local state
   const [inputValue, setInputValue] = React.useState('');
   const [showSettings, setShowSettings] = React.useState(false);
-  const [streamingContent, setStreamingContent] = React.useState<string>('');
 
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -89,39 +84,19 @@ export const ChatInterface: React.FC = () => {
       };
       addMessage(assistantMessage);
 
-      // Start streaming and consume generator to activate flow
-      const result = await streamingService.createChatCompletion(request, {
+      // Start streaming
+      await streamingService.createChatCompletion(request, {
         onMessage: (chunk: string) => {
           updateLastMessage(chunk);
-          setStreamingContent(chunk);
         },
         onComplete: () => {
           setLoading(false);
-          setStreamingContent('');
-          announceStatus('Ответ получен');
         },
         onError: (error: Error) => {
           setError(error.message);
           setLoading(false);
-          setStreamingContent('');
-          announceError(`Ошибка: ${error.message}`);
         },
       });
-
-      if (request.stream && result && (result as any)[Symbol.asyncIterator]) {
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          for await (const _chunk of result as AsyncGenerator<any>) {
-            // chunks handled in onMessage
-          }
-        } catch (streamErr) {
-          const msg = streamErr instanceof Error ? streamErr.message : 'Stream interrupted';
-          setError(msg);
-          setLoading(false);
-        }
-      } else {
-        setLoading(false);
-      }
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
@@ -269,19 +244,14 @@ export const ChatInterface: React.FC = () => {
         )}
       </div>
 
-      {/* Accessibility live regions */}
-      <StreamingLiveRegion
-        isStreaming={isLoading}
-        currentContent={streamingContent}
-      />
-      <StatusLiveRegion
-        status={errorStatus}
-        level="error"
-      />
-      <StatusLiveRegion
-        status={generalStatus}
-        level="info"
-      />
+      {/* Live region for screen readers */}
+      <div
+        aria-live="polite"
+        aria-atomic="false"
+        className="sr-only"
+      >
+        {isLoading && 'Assistant is responding...'}
+      </div>
     </div>
   );
 };

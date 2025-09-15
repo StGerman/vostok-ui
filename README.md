@@ -1,11 +1,17 @@
-# React + TypeScript + Vite
+# Vostok Chat Interface
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A production-ready React application that provides a modern chat interface for the Vostok RAG (Retrieval-Augmented Generation) system.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **🚀 Modern Stack**: React 19, TypeScript 5.2+, Zustand, TailwindCSS
+- **♿ Accessibility First**: WCAG 2.1 AA compliant with live regions for screen readers
+- **🌙 Theme Support**: Light/dark mode with system preference detection
+- **📱 Responsive Design**: Mobile-first approach with smooth animations
+- **🔄 Streaming Responses**: Real-time AI responses with OpenAI SDK integration
+- **📚 Source Attribution**: Document references and citations
+- **⚡ Performance Optimized**: React.memo, virtualization, and error boundaries
+- **🧪 Comprehensive Testing**: Unit, integration, and E2E tests
 
 ## Expanding the ESLint configuration
 
