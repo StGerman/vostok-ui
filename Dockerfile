@@ -14,7 +14,7 @@ LABEL org.opencontainers.image.source="https://github.com/StGerman/vostok"
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production --silent
+RUN npm ci --silent
 
 # Copy source code
 COPY . .
