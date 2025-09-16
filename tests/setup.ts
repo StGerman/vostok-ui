@@ -29,3 +29,6 @@ Object.defineProperty(window, 'matchMedia', {
 
 // Add vi import for the mock
 import { vi } from 'vitest';
+
+// Mock scrollIntoView for jsdom compatibility
+Element.prototype.scrollIntoView = vi.fn();

@@ -1,4 +1,4 @@
-import { test, expect, type Page, type Locator } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 // import AxeBuilder from '@axe-core/playwright';
 // TODO: Install and configure axe-core for accessibility testing
 

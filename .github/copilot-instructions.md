@@ -22,17 +22,14 @@ This project follows **Spec-Driven Development (SDD)** methodology:
 4. **Refactor**: Clean up while maintaining green tests
 
 ### 3. Current Feature
-- **Active Branch**: `002-code-quality-type`
-- **Spec Location**: `/specs/002-code-quality-type/spec.md`
-- **Plan Location**: `/specs/002-code-quality-type/plan.md`
-- **Tasks Location**: `/specs/002-code-quality-type/tasks.md` (to be generated)
-
-### 4. Recent Features
-- **001-production-ready-chat**: Completed - Initial chat interface with streaming support
+- **Active Branch**: `001-production-ready-chat`
+- **Spec Location**: `/specs/001-production-ready-chat/spec.md`
+- **Plan Location**: `/specs/001-production-ready-chat/plan.md`
+- **Tasks Location**: `/specs/001-production-ready-chat/tasks.md`
 
 ## Active Technologies
 
-**Language/Version**: TypeScript 5.2+ with React 19 (Strict Mode Enforced)
+**Language/Version**: TypeScript 5.2+ with React 19
 **Primary Dependencies**: React 19, Zustand, TailwindCSS, Headless UI, OpenAI JavaScript SDK, TanStack Query, React Router v6
 **Testing**: Vitest for unit tests, Playwright for end-to-end testing
 **Storage**: Browser localStorage for themes/preferences, memory for conversation state
@@ -88,32 +85,6 @@ npm run build
 # Preview production build
 npm run preview
 ```
-
-## Type Safety Guidelines (Feature 002)
-
-### 1. Strict TypeScript Enforcement
-- **FORBIDDEN**: `any` type usage - use proper interfaces instead
-- **REQUIRED**: All API mocks must implement actual interfaces
-- **PATTERN**: Use union types and generics for type safety
-- **VALIDATION**: Run `npm run type-check` before commits
-
-### 2. Component Test ID Alignment
-- **MessageBubble**: Use `data-testid={message-${message.role}}` not `message-bubble`
-- **ChatInput**: Wrap textarea with `data-testid="chat-input"` container
-- **Pattern**: Component APIs must match test contract expectations
-- **Rule**: Tests define the contract - implementation follows
-
-### 3. Error Handling Requirements
-- **Structure**: Use ErrorMessage interface with user-friendly messages
-- **Specificity**: Handle 401 (auth), 429 (rate limit), timeout scenarios
-- **Cleanup**: Proper AbortController disposal on errors
-- **Logging**: Detailed context for debugging, simple messages for users
-
-### 4. Accessibility Implementation
-- **ARIA Labels**: Dynamic labels for all interactive elements
-- **Screen Readers**: Live regions for streaming content updates
-- **Semantic HTML**: Proper heading hierarchy and landmark roles
-- **Compliance**: WCAG 2.1 AA level required
 
 ## Key Development Principles
 
@@ -208,8 +179,7 @@ interface CompletionRequest {
 
 ## Recent Changes
 
-- **002-code-quality-type**: ACTIVE - Code quality & type safety improvements with mandatory quality gates
-- **001-production-ready-chat**: Completed - TypeScript 5.2+ + React 19 with streaming chat interface, TailwindCSS theming, and OpenAI protocol compatibility
+- **001-production-ready-chat**: Added TypeScript 5.2+ + React 19 with streaming chat interface, TailwindCSS theming, and OpenAI protocol compatibility
 
 ## Implementation Notes
 
