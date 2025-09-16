@@ -11,8 +11,8 @@ describe('Memory Cleanup Integration', () => {
   let mockCleanupRegistry: CleanupRegistry;
   let abortControllers: AbortController[];
   let eventListeners: { target: EventTarget; type: string; listener: EventListener }[];
-  let timeouts: number[];
-  let intervals: number[];
+  let timeouts: NodeJS.Timeout[];
+  let intervals: NodeJS.Timeout[];
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -37,8 +37,16 @@ describe('Memory Cleanup Integration', () => {
         const results = [];
         for (const [id, handler] of handlers.entries()) {
           if (!type || handler.type === type) {
-            const result = await handler.cleanup();
-            results.push({ handlerId: id, ...result });
+            try {
+              const result = await handler.cleanup();
+              results.push({ handlerId: id, ...result });
+            } catch (error) {
+              results.push({
+                handlerId: id,
+                success: false,
+                error: error instanceof Error ? error : new Error('Unknown error')
+              });
+            }
           }
         }
         return results;
@@ -315,7 +323,9 @@ describe('Memory Cleanup Integration', () => {
 
       expect(results).toHaveLength(2);
       expect(results.every(r => r.success)).toBe(true);
-      expect(mockReaders.every(r => r.cancel)).toHaveBeenCalled();
+      mockReaders.forEach(reader => {
+        expect(reader.cancel).toHaveBeenCalled();
+      });
     });
   });
 

@@ -2,6 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ChatInterface from './ChatInterface';
 
+// Mock scrollIntoView
+HTMLElement.prototype.scrollIntoView = vi.fn();
+
 // Mock streaming service to simulate chunked response
 vi.mock('./services/streamingService', () => {
   class MockStreamingService {

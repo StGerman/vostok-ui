@@ -32,11 +32,19 @@ This project follows **Spec-Driven Development (SDD)** methodology:
 
 ## Active Technologies
 
-**Language/Version**: TypeScript 5.2+ with React 19
+**Language/Version**: TypeScript 5.2+ with React 19 (Strict Mode Enforced)
 **Primary Dependencies**: React 19, Zustand, TailwindCSS, Headless UI, OpenAI JavaScript SDK, TanStack Query, React Router v6
 **Testing**: Vitest for unit tests, Playwright for end-to-end testing
 **Storage**: Browser localStorage for themes/preferences, memory for conversation state
 **Project Type**: Frontend web application with backend API integration
+
+## Code Quality Requirements (Feature 002)
+
+**TypeScript Strict Mode**: NO `any` types allowed - use proper interfaces
+**Error Handling**: Structured error messages with user-friendly guidance
+**Memory Management**: Proper AbortController cleanup and resource disposal
+**Accessibility**: WCAG 2.1 AA compliance with proper ARIA labels
+**Test Alignment**: Component APIs must match test contract expectations
 
 ## Project Structure
 
@@ -80,6 +88,32 @@ npm run build
 # Preview production build
 npm run preview
 ```
+
+## Type Safety Guidelines (Feature 002)
+
+### 1. Strict TypeScript Enforcement
+- **FORBIDDEN**: `any` type usage - use proper interfaces instead
+- **REQUIRED**: All API mocks must implement actual interfaces
+- **PATTERN**: Use union types and generics for type safety
+- **VALIDATION**: Run `npm run type-check` before commits
+
+### 2. Component Test ID Alignment
+- **MessageBubble**: Use `data-testid={message-${message.role}}` not `message-bubble`
+- **ChatInput**: Wrap textarea with `data-testid="chat-input"` container
+- **Pattern**: Component APIs must match test contract expectations
+- **Rule**: Tests define the contract - implementation follows
+
+### 3. Error Handling Requirements
+- **Structure**: Use ErrorMessage interface with user-friendly messages
+- **Specificity**: Handle 401 (auth), 429 (rate limit), timeout scenarios
+- **Cleanup**: Proper AbortController disposal on errors
+- **Logging**: Detailed context for debugging, simple messages for users
+
+### 4. Accessibility Implementation
+- **ARIA Labels**: Dynamic labels for all interactive elements
+- **Screen Readers**: Live regions for streaming content updates
+- **Semantic HTML**: Proper heading hierarchy and landmark roles
+- **Compliance**: WCAG 2.1 AA level required
 
 ## Key Development Principles
 

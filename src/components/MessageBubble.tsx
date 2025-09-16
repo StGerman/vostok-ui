@@ -9,9 +9,10 @@ import './markdown-styles.css';
 interface CopyButtonProps {
   content: string;
   isDark: boolean;
+  onCopy: (content: string) => void;
 }
 
-const CopyButton: React.FC<CopyButtonProps> = ({ content, isDark }) => {
+const CopyButton: React.FC<CopyButtonProps> = ({ content, isDark, onCopy }) => {
   const [copied, setCopied] = React.useState(false);
 
   const handleCopy = async () => {
@@ -19,6 +20,7 @@ const CopyButton: React.FC<CopyButtonProps> = ({ content, isDark }) => {
       await navigator.clipboard.writeText(content);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      onCopy(content); // Call the callback
     } catch (error) {
       console.error('Failed to copy text:', error);
     }
@@ -72,6 +74,7 @@ const AssistantAvatar: React.FC<AssistantAvatarProps> = ({ isDark }) => (
 const MessageBubbleComponent: React.FC<MessageBubbleProps & { isDark: boolean }> = ({
   message,
   isLast,
+  onCopy,
   isDark,
 }) => {
   const isUser = message.role === 'user';
@@ -79,8 +82,8 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps & { isDark: boolean }>
 
   return (
     <div
-      className={`flex gap-3 group relative ${isUser ? 'flex-row-reverse' : 'flex-row'} ${isLast ? 'animate-slide-up' : ''}`}
-      data-testid="message-bubble"
+      className={`flex gap-3 group relative ${isUser ? 'flex-row-reverse' : 'flex-row'} ${isLast ? 'animate-slide-up' : ''} ${isDark ? 'dark' : ''}`}
+      data-testid={`message-${message.role}`}
       data-role={message.role}
     >
       {/* Avatar */}
@@ -107,7 +110,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps & { isDark: boolean }>
           data-testid="message-content"
         >
           {/* Copy button */}
-          <CopyButton content={message.content} isDark={isDark} />
+          <CopyButton content={message.content} isDark={isDark} onCopy={onCopy} />
 
           {/* Message text with enhanced markdown support for assistant messages */}
           {isUser ? (
@@ -436,6 +439,47 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps & { isDark: boolean }>
             </div>
           )}
         </div>
+
+        {/* Source Attribution - only for assistant messages with sources */}
+        {!isUser && message.sources && message.sources.length > 0 && (
+          <div className={`mt-3 space-y-2`}>
+            {message.sources.map((source, index) => (
+              <div
+                key={`${source.document_id}-${index}`}
+                className={`
+                  flex items-center gap-2 p-2 rounded-lg border
+                  ${isDark
+                    ? 'bg-gray-700 border-gray-600'
+                    : 'bg-gray-50 border-gray-200'
+                  }
+                `}
+              >
+                <ExternalLink className={`h-4 w-4 flex-shrink-0 ${
+                  isDark ? 'text-gray-400' : 'text-gray-500'
+                }`} />
+                <div className="flex-1 min-w-0">
+                  <a
+                    href={source.access_url || source.document_url || '#'}
+                    className={`
+                      text-sm font-medium hover:underline truncate block
+                      ${isDark ? 'text-blue-400' : 'text-blue-600'}
+                    `}
+                    title={source.document_title}
+                  >
+                    {source.document_title}
+                  </a>
+                  <div className={`text-xs ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`}>
+                    {source.page_number && `Page ${source.page_number}`}
+                    {source.page_number && source.relevance_score && ' • '}
+                    {source.relevance_score && `${Math.round(source.relevance_score * 100)}% relevant`}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Timestamp */}
         <div className={`

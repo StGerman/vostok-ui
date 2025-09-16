@@ -95,7 +95,8 @@ const ChatInputComponent: React.FC<ChatInputWithSettingsProps> = ({
               }
               ${disabled || isLoading ? 'opacity-50 cursor-not-allowed' : ''}
             `}
-            data-testid="chat-input-textarea"
+            data-testid="chat-input"
+            aria-label="Type your message"
           />
 
           {/* Character count (optional) */}
@@ -126,6 +127,7 @@ const ChatInputComponent: React.FC<ChatInputWithSettingsProps> = ({
             }
           `}
           title={isLoading ? 'Отправка...' : 'Отправить сообщение (Enter)'}
+          aria-label={isLoading ? 'Sending message' : 'Send message'}
           data-testid="send-button"
         >
           {isLoading ? (

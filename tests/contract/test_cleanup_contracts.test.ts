@@ -98,7 +98,7 @@ describe('Cleanup Handler Interface Contracts', () => {
         type: 'custom' as CleanupType,
         priority: 2,
         cleanup: async () => {
-          throw new Error('Simulated cleanup failure');
+          return { success: false, error: new Error('Simulated cleanup failure') };
         },
         canCleanup: () => true,
         metadata: {
