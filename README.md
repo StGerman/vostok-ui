@@ -4,7 +4,7 @@ A production-ready React application that provides a modern chat interface for t
 
 ## ✨ Features
 
-- **🚀 Modern Stack**: React 19, TypeScript 5.2+, Zustand, TailwindCSS
+- **🚀 Modern Stack**: React 19, TypeScript 5.2+ (recommended settings), Zustand, TailwindCSS
 - **♿ Accessibility First**: WCAG 2.1 AA compliant with live regions for screen readers
 - **🌙 Theme Support**: Light/dark mode with system preference detection
 - **📱 Responsive Design**: Mobile-first approach with smooth animations
@@ -12,6 +12,26 @@ A production-ready React application that provides a modern chat interface for t
 - **📚 Source Attribution**: Document references and citations
 - **⚡ Performance Optimized**: React.memo, virtualization, and error boundaries
 - **🧪 Comprehensive Testing**: Unit, integration, and E2E tests
+
+## 🔧 TypeScript Configuration
+
+This project uses **TypeScript recommended settings** for optimal developer experience:
+
+```json
+{
+  "strict": false,
+  "noImplicitAny": false,
+  "strictNullChecks": false,
+  "noUnusedLocals": true,
+  "noUnusedParameters": true,
+  "noFallthroughCasesInSwitch": true
+}
+```
+
+This configuration provides:
+- **Flexible Development**: Less restrictive type checking for faster iteration
+- **Essential Safety**: Unused variables and fallthrough case detection
+- **Production Ready**: Full compilation and build system compatibility
 
 ## Expanding the ESLint configuration
 

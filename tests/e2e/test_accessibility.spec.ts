@@ -5,13 +5,51 @@ import { test, expect } from '@playwright/test';
 test.describe('Accessibility Compliance', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
+    // Wait for the interface to load
+    await page.waitForLoadState('networkidle');
   });
 
   test('should pass axe accessibility audit on initial load', async ({ page }) => {
     // TODO: Install axe-core and uncomment
     // const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
     // expect(accessibilityScanResults.violations).toEqual([]);
-    expect(page).toBeTruthy(); // Placeholder until axe is configured
+
+    // Basic accessibility checks until axe is configured
+    const mainContent = page.locator('main, [role="main"]');
+    await expect(mainContent).toBeVisible();
+
+    // Check for heading structure
+    const h1 = page.locator('h1');
+    await expect(h1).toBeVisible();
+
+    // Check language attribute
+    const htmlLang = await page.getAttribute('html', 'lang');
+    expect(htmlLang).toBeTruthy();
+  });
+
+  test('should have proper document structure and landmarks', async ({ page }) => {
+    // Check for main landmark
+    const main = page.locator('main, [role="main"]');
+    await expect(main).toBeVisible();
+
+    // Check for proper heading hierarchy
+    const h1 = page.locator('h1');
+    await expect(h1).toBeVisible();
+
+    // Ensure headings follow logical order
+    const headings = await page.locator('h1, h2, h3, h4, h5, h6').all();
+    if (headings.length > 1) {
+      const levels = await Promise.all(
+        headings.map(async (heading) => {
+          const tagName = await heading.evaluate(el => el.tagName.toLowerCase());
+          return parseInt(tagName.replace('h', ''));
+        })
+      );
+
+      for (let i = 1; i < levels.length; i++) {
+        expect(levels[i] - levels[i-1]).toBeLessThanOrEqual(1);
+      }
+    }
   });
 
   test('should pass accessibility audit with chat messages', async ({ page }) => {

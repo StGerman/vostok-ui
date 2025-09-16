@@ -11,12 +11,15 @@
     "preview": "vite preview",
     "start": "npm run dev",
     "type-check": "tsc --noEmit",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest --coverage",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "check-types": "node scripts/check-types.js",
+    "validate-types": "npm run type-check && npm run check-types"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.8",
@@ -56,5 +59,8 @@
     "typescript-eslint": "^8.39.1",
     "vite": "^7.1.5",
     "vitest": "^3.2.4"
+  },
+  "overrides": {
+    "prismjs": "^1.30.0"
   }
 }

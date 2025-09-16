@@ -35,6 +35,14 @@ This project follows **Spec-Driven Development (SDD)** methodology:
 **Storage**: Browser localStorage for themes/preferences, memory for conversation state
 **Project Type**: Frontend web application with backend API integration
 
+## Code Quality Requirements (Feature 002)
+
+**TypeScript Strict Mode**: NO `any` types allowed - use proper interfaces
+**Error Handling**: Structured error messages with user-friendly guidance
+**Memory Management**: Proper AbortController cleanup and resource disposal
+**Accessibility**: WCAG 2.1 AA compliance with proper ARIA labels
+**Test Alignment**: Component APIs must match test contract expectations
+
 ## Project Structure
 
 ```
@@ -132,7 +140,7 @@ npm run preview
 
 ### Request Format
 ```typescript
-interface VostokChatCompletionRequest {
+interface CompletionRequest {
   model: string;
   messages: ChatMessage[];
   stream?: boolean;

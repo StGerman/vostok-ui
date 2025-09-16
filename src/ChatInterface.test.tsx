@@ -26,14 +26,17 @@ describe('ChatInterface', () => {
   it('sends a message and streams assistant response', async () => {
     render(<ChatInterface />);
 
-    const textarea = await screen.findByTestId('chat-input-textarea');
+    const textarea = await screen.findByTestId('chat-input');
     fireEvent.change(textarea, { target: { value: 'Hi' } });
 
     const sendButton = screen.getByTestId('send-button');
     fireEvent.click(sendButton);
 
     // User message appears
-    expect(await screen.findAllByTestId('message-bubble')).toHaveLength(2); // user + assistant placeholder
+    const userMessage = await screen.findByTestId('message-user');
+    const assistantMessage = await screen.findByTestId('message-assistant');
+    expect(userMessage).toBeTruthy();
+    expect(assistantMessage).toBeTruthy();
 
     // Wait for streaming to complete (assistant message content grows)
     await waitFor(() => {
