@@ -22,10 +22,13 @@ This project follows **Spec-Driven Development (SDD)** methodology:
 4. **Refactor**: Clean up while maintaining green tests
 
 ### 3. Current Feature
-- **Active Branch**: `001-production-ready-chat`
-- **Spec Location**: `/specs/001-production-ready-chat/spec.md`
-- **Plan Location**: `/specs/001-production-ready-chat/plan.md`
-- **Tasks Location**: `/specs/001-production-ready-chat/tasks.md`
+- **Active Branch**: `002-code-quality-type`
+- **Spec Location**: `/specs/002-code-quality-type/spec.md`
+- **Plan Location**: `/specs/002-code-quality-type/plan.md`
+- **Tasks Location**: `/specs/002-code-quality-type/tasks.md` (to be generated)
+
+### 4. Recent Features
+- **001-production-ready-chat**: Completed - Initial chat interface with streaming support
 
 ## Active Technologies
 
@@ -132,7 +135,7 @@ npm run preview
 
 ### Request Format
 ```typescript
-interface VostokChatCompletionRequest {
+interface CompletionRequest {
   model: string;
   messages: ChatMessage[];
   stream?: boolean;
@@ -171,7 +174,8 @@ interface VostokChatCompletionRequest {
 
 ## Recent Changes
 
-- **001-production-ready-chat**: Added TypeScript 5.2+ + React 19 with streaming chat interface, TailwindCSS theming, and OpenAI protocol compatibility
+- **002-code-quality-type**: ACTIVE - Code quality & type safety improvements with mandatory quality gates
+- **001-production-ready-chat**: Completed - TypeScript 5.2+ + React 19 with streaming chat interface, TailwindCSS theming, and OpenAI protocol compatibility
 
 ## Implementation Notes
 

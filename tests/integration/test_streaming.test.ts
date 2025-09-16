@@ -1,18 +1,26 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import type { VostokChatCompletionRequest } from '../../src/types/chat';
+import { StreamingService } from '../../src/services/streamingService';
 
-// This test will initially fail until we implement the streaming service
+// Updated test to validate actual streaming functionality (no longer expecting failures)
 describe('Streaming Message Flow Integration', () => {
+  let streamingService: StreamingService;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    streamingService = new StreamingService('test-api-key', 'http://localhost:8000');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should successfully create streaming service instance', () => {
+    expect(streamingService).toBeInstanceOf(StreamingService);
+    expect(streamingService).toBeDefined();
   });
 
   it('should handle complete streaming flow from request to response', async () => {
-    // Mock the streaming service (will fail until implemented)
-    const mockStreamingService = {
-      createChatCompletion: vi.fn(),
-    };
-
     const request: VostokChatCompletionRequest = {
       model: 'claude-sonnet-4-20250514',
       messages: [
@@ -27,12 +35,63 @@ describe('Streaming Message Flow Integration', () => {
       temperature: 0.1,
     };
 
-    // This expectation will fail until we implement the service
-    expect(() => {
-      // This should import from '../../src/services/streamingService'
-      // but the file doesn't exist yet, so this test should fail
-      require('../../src/services/streamingService');
-    }).toThrow();
+    // Mock successful streaming response
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers({
+        'content-type': 'text/event-stream'
+      }),
+      body: {
+        getReader: () => ({
+          read: vi.fn()
+            .mockResolvedValueOnce({
+              done: false,
+              value: new TextEncoder().encode('data: {"id":"chatcmpl-123","object":"chat.completion.chunk","choices":[{"index":0,"delta":{"role":"assistant","content":"The key"},"finish_reason":null}]}\n\n')
+            })
+            .mockResolvedValueOnce({
+              done: false,
+              value: new TextEncoder().encode('data: {"id":"chatcmpl-123","object":"chat.completion.chunk","choices":[{"index":0,"delta":{"content":" features"},"finish_reason":null}]}\n\n')
+            })
+            .mockResolvedValueOnce({
+              done: false,
+              value: new TextEncoder().encode('data: [DONE]\n\n')
+            })
+            .mockResolvedValueOnce({
+              done: true,
+              value: undefined
+            })
+        })
+      }
+    });
+
+    global.fetch = mockFetch;
+
+    const messages: string[] = [];
+    const options = {
+      onMessage: (content: string) => {
+        messages.push(content);
+      },
+      onComplete: vi.fn(),
+      onError: vi.fn()
+    };
+
+    const result = streamingService.createChatCompletion(request, options);
+    expect(result).toBeDefined();
+
+    // Verify fetch was called with correct parameters
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/v1/chat/completions'),
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json',
+          'Authorization': expect.stringContaining('Bearer')
+        }),
+        body: expect.stringContaining('"stream":true'),
+        signal: expect.any(AbortSignal)
+      })
+    );
   });
 
   it('should accumulate streaming chunks into complete message', async () => {
